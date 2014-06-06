@@ -1,6 +1,8 @@
 #ifndef MDUSERAPI_H
 #define MDUSERAPI_H
 #include"ThostTraderApi\ThostFtdcMdApi.h"
+#include"CTPStruct.h"
+#include"CTPMsgQueue.h"
 #include<set>
 #include<string>
 #include<Windows.h>
@@ -23,7 +25,7 @@ public:
 private:
     void Subscribe(const set<string> &setInstrumentIDs);
     void ReqUserLogin();
-
+    void RegisterMsgQueue(CTPMsgQueue* pMsgQueue);
     virtual void OnFrontConnected();
     virtual void OnFrontDisconnected(int nReason);
     virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -33,7 +35,7 @@ private:
     virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 
     //检查是否出错
-   // bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//将出错消息送到消息队列
+    bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//将出错消息送到消息队列
     bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);//不送出错消息
 
 private:
@@ -47,6 +49,9 @@ private:
     string m_strBrokerId; //期商ID
     string m_strInvestorId;//投资者ID
     string m_strPassword;//密码
+
+    CTPMsgQueue* m_msgQueue;// 消息队列
+    ConnectionStatus m_status;//连接状态
 
 
 }; 

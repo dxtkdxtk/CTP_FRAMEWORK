@@ -8,7 +8,8 @@ MdUserApi::MdUserApi(void)
 {
     m_pMdUserApi = NULL;
     m_iRequestID = 0;
-   
+    m_msgQueue = NULL;
+    m_status = E_uninit;
     InitializeCriticalSection(&m_csMapInstrumentIDs);
 
 }
@@ -16,14 +17,30 @@ MdUserApi::MdUserApi(void)
 MdUserApi::~MdUserApi(void)
 {
     Disconnect();
+    DeleteCriticalSection(&m_csMapInstrumentIDs);
 }
 
+void MdUserApi::RegisterMsgQueue(CTPMsgQueue* pMsgQueue)
+{
+    m_msgQueue = pMsgQueue;
+}
+
+bool MdUserApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+    bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
+    if (bRet)
+    {
+        if (m_msgQueue)
+            m_msgQueue->Input_OnRspError(this, pRspInfo, nRequestID, bIsLast);
+    }
+    return bRet;
+}
 bool MdUserApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
     bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
     if (bRet)
     {
-        cout << "错误ID: " << pRspInfo->ErrorID << "  错误信息： " << pRspInfo->ErrorMsg << endl;
+        //cout << "错误ID: " << pRspInfo->ErrorID << "  错误信息： " << pRspInfo->ErrorMsg << endl;
     }
     return bRet;
 }
@@ -43,6 +60,9 @@ void MdUserApi::Connect(const string& strPath,
     m_pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi(pPath, (strAddresses.find("udp://") != strAddresses.npos));
     delete[] pPath;
 
+    m_status = E_inited;
+    if (m_msgQueue)
+        m_msgQueue->Input_OnConnect(this, NULL, m_status);
     if (m_pMdUserApi)
     {
         m_pMdUserApi->RegisterSpi(this);
@@ -70,11 +90,10 @@ void MdUserApi::Connect(const string& strPath,
         delete[] buf;
 
         m_pMdUserApi->Init();
-
+        m_status = E_connecting;
+        if (m_msgQueue)
+            m_msgQueue->Input_OnConnect(this, NULL, m_status);
     }//end 
-    
-
-
 }
 
 void MdUserApi::ReqUserLogin()
@@ -89,16 +108,22 @@ void MdUserApi::ReqUserLogin()
 
     //只有这一处用到了m_iRequestID，没有必要每次重连m_iRequestID都从0开始
     m_pMdUserApi->ReqUserLogin(&request, ++m_iRequestID);
+    m_status = E_logining;
+    if (m_msgQueue)
+        m_msgQueue->Input_OnConnect(this, NULL, m_status);
     
 }
 
 void MdUserApi::Disconnect()
 {
+    m_status = E_unconnected;
     if (m_pMdUserApi)
     {
         m_pMdUserApi->RegisterSpi(NULL);
         m_pMdUserApi->Release();
         m_pMdUserApi = NULL;
+        if (m_msgQueue)
+            m_msgQueue->Input_OnDisconnect(this, NULL, m_status);
     }
 }
 
@@ -211,16 +236,22 @@ void MdUserApi::Unsubscribe(const string& strInstrumentIDs)
 
 void MdUserApi::OnFrontConnected()
 {
+    m_status = E_connected;
+    if (m_msgQueue)
+        m_msgQueue->Input_OnConnect(this, NULL, m_status);
     //连接成功后自动请求登录
     ReqUserLogin();
 }
 
 void MdUserApi::OnFrontDisconnected(int nReason)
 {
+    m_status = E_unconnected;
     CThostFtdcRspInfoField RspInfo;
     //连接失败返回的信息是拼接而成，主要是为了统一输出
     RspInfo.ErrorID = nReason;
     GetOnFrontDisconnectedMsg(&RspInfo);
+    if (m_msgQueue)
+        m_msgQueue->Input_OnDisconnect(this, &RspInfo, m_status);
 }
 
 void MdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -228,7 +259,9 @@ void MdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThos
     if (!IsErrorRspInfo(pRspInfo)
         && pRspUserLogin)
     {
-
+        m_status = E_logined;
+        if (m_msgQueue)
+            m_msgQueue->Input_OnConnect(this, pRspUserLogin, m_status);
         //有可能断线了，本处是断线重连后重新订阅
         set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
         //Unsubscribe(mapOld);//由于已经断线了，没有必要再取消订阅
@@ -236,7 +269,10 @@ void MdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThos
     }
     else
     {
-        cout << "登陆行情端成功" << endl;
+        m_status = E_authed;
+        if (m_msgQueue)
+            m_msgQueue->Input_OnDisconnect(this, pRspInfo, E_logining);
+        //cout << "登陆行情端成功" << endl;
     }
 }
 
@@ -268,11 +304,13 @@ void MdUserApi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecifi
 //行情回调，得保证此函数尽快返回
 void MdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-    cout << pDepthMarketData->LastPrice << endl;
+    if (m_msgQueue)
+        m_msgQueue->Input_OnRtnDepthMarketData(this, pDepthMarketData);
 }
 
 
 void MdUserApi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-
+    if (m_msgQueue)
+        m_msgQueue->Input_OnRspError(this, pRspInfo, nRequestID, bIsLast);
 }
