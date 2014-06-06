@@ -1,6 +1,8 @@
 #ifndef CTPSTRUCT_H
 #define CTPSTRUCT_H
 #include"ThostTraderApi\ThostFtdcUserApiStruct.h"
+
+//连接状态
 enum ConnectionStatus
 {
     E_uninit,		//未初始化
@@ -17,6 +19,7 @@ enum ConnectionStatus
     E_conn_max		//最大值
 };
 
+//函数回调定义
 typedef void(__stdcall *fnOnConnect)(void* pApi, CThostFtdcRspUserLoginField *pRspUserLogin, ConnectionStatus result);//连接后的结果状态
 typedef void(__stdcall *fnOnDisconnect)(void* pApi, CThostFtdcRspInfoField *pRspInfo, ConnectionStatus step);//出错时所处的状态
 typedef void(__stdcall *fnOnErrRtnOrderAction)(void* pTraderApi, CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo);
@@ -43,3 +46,4 @@ typedef void(__stdcall *fnOnRtnTrade)(void* pTraderApi, CThostFtdcTradeField *pT
 
 
 #endif
+

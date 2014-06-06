@@ -1,17 +1,66 @@
-#include"ThostTraderApi\ThostFtdcTraderApi.h"
+#pragma once
 
-#include<set>
-#include<map>
-#include<list>
-#include<string>
+#include "ThostTraderApi\ThostFtdcTraderApi.h"
 
+#include <set>
+#include <list>
+#include <map>
+#include <string>
+#include<Windows.h>
+#include"LockFreeQ.h"
+#include"CLock.h"
+#include"CTPStruct.h"
+#include"CTPMsgQueue.h"
+#include"toolkit.h"
 using namespace std;
 
-class TraderApi : public CThostFtdcTraderSpi
+class CTPMsgQueue;
+
+class TraderApi :
+    public CThostFtdcTraderSpi
 {
-public :
+    //请求数据包类型
+    enum RequestType
+    {
+        E_ReqAuthenticateField,
+        E_ReqUserLoginField,
+        E_SettlementInfoConfirmField,
+        E_QryInstrumentField,
+        E_InputOrderField,
+        E_InputOrderActionField,
+        E_QryTradingAccountField,
+        E_QryInvestorPositionField,
+        E_QryInvestorPositionDetailField,
+        E_QryInstrumentCommissionRateField,
+        E_QryInstrumentMarginRateField,
+        E_QryDepthMarketDataField,
+    };
+
+    //请求数据包结构体
+    struct SRequest
+    {
+        RequestType type;
+        union{
+            CThostFtdcReqAuthenticateField				ReqAuthenticateField;
+            CThostFtdcReqUserLoginField					ReqUserLoginField;
+            CThostFtdcSettlementInfoConfirmField		SettlementInfoConfirmField;
+            CThostFtdcQryDepthMarketDataField			QryDepthMarketDataField;
+            CThostFtdcQryInstrumentField				QryInstrumentField;
+            CThostFtdcQryInstrumentCommissionRateField	QryInstrumentCommissionRateField;
+            CThostFtdcQryInstrumentMarginRateField		QryInstrumentMarginRateField;
+            CThostFtdcQryInvestorPositionField			QryInvestorPositionField;
+            CThostFtdcQryInvestorPositionDetailField    QryInvestorPositionDetailField;
+            CThostFtdcQryTradingAccountField			QryTradingAccountField;
+            CThostFtdcInputOrderField					InputOrderField;
+            CThostFtdcInputOrderActionField				InputOrderActionField;
+        };
+    };
+
+public:
     TraderApi(void);
-    ~TraderApi(void);
+    virtual ~TraderApi(void);
+
+    void RegisterMsgQueue(CTPMsgQueue* pMsgQueue);
 
     void Connect(const string& szPath,
         const string& szAddresses,
@@ -36,7 +85,6 @@ public :
         TThostFtdcPriceType StopPrice,
         TThostFtdcVolumeConditionType VolumeCondition);
     void ReqOrderAction(CThostFtdcOrderField *pOrder);
-    
 
     void ReqQryTradingAccount();
     void ReqQryInvestorPosition(const string& szInstrumentId);
@@ -47,12 +95,30 @@ public :
     void ReqQryDepthMarketData(const string& szInstrumentId);
 
 private:
-    //登陆相关
+    //数据包发送线程
+    friend DWORD WINAPI SendThread(LPVOID lpParam);
+    void RunInThread();
+    void StopThread();
+
+    //指定数据包类型，生成对应数据包
+    SRequest * MakeRequestBuf(RequestType type);
+    //清除将发送请求包队列
+    void ReleaseRequestListBuf();
+    //清除已发送请求包池
+    void ReleaseRequestMapBuf();
+    //清除指定请求包池中指定包
+    void ReleaseRequestMapBuf(int nRequestID);
+    //添加到已经请求包池
+    void AddRequestMapBuf(int nRequestID, SRequest* pRequest);
+    //添加到将发送包队列
+    void AddToSendQueue(SRequest * pRequest);
+
     void ReqAuthenticate();
     void ReqUserLogin();
     void ReqSettlementInfoConfirm();
 
-    //错误信息
+    //检查是否出错
+    bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
     bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);//不输出信息
 
     //连接
@@ -99,6 +165,34 @@ private:
     //其它
     virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
     virtual void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
+
 private:
-    
+    ConnectionStatus			m_status;				//连接状态
+    volatile LONG				m_lRequestID;			//请求ID,得保持自增
+
+    CThostFtdcRspUserLoginField m_RspUserLogin;			//返回的登录成功响应，目前利用此内成员进行报单所属区分
+
+    CRITICAL_SECTION			m_csOrderRef;
+    int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
+    CThostFtdcTraderApi*		m_pApi;	//交易API
+    CTPMsgQueue*				m_msgQueue;				//消息队列指针
+
+    string						m_szPath;				//生成配置文件的路径
+    set<string>					m_arrAddresses;			//服务器地址
+    string						m_szBrokerId;			//期商ID
+    string						m_szInvestorId;			//投资者ID
+    string						m_szPassword;			//密码
+    string						m_szUserProductInfo;	//产品信息
+    string						m_szAuthCode;			//认证码
+
+    int							m_nSleep;
+    volatile bool				m_bRunning;
+    HANDLE						m_hThread;
+
+    CRITICAL_SECTION			m_csList;
+    list<SRequest*>				m_reqList;				//将发送请求队列
+
+    CRITICAL_SECTION			m_csMap;
+    map<int, SRequest*>			m_reqMap;				//已发送请求池
 };
+

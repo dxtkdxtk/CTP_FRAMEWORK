@@ -1,6 +1,7 @@
 // Copyright Idaho O Edokpayi 2008
 // Code is governed by Code Project Open License 
-
+#ifndef LOCKFREEQ_H
+#define LOCKFREEQ_H
 #include <exception>
 #include <windows.h>
 #include <algorithm>
@@ -307,3 +308,5 @@ public:
         return true;
     }
 };
+
+#endif 

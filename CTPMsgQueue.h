@@ -166,6 +166,7 @@ private:
     {
         if (m_fnOnConnect)
             (*m_fnOnConnect)(pItem->pApi, &pItem->RspUserLogin, pItem->Status);
+        
     }
     void Output_OnDisconnect(SMsgItem* pItem)
     {
