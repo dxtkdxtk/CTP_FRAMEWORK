@@ -18,14 +18,14 @@ public:
         const string& strInvestorId,//投资者ID
         const string& strPassword);//投资者密码
     void Disconnect();
-    
-    void Subscribe(const string &strInstrumentIDs);
-    void Unsubscribe(const string &strInstrumentIDs);
+    void RegisterMsgQueue(CTPMsgQueue* pMsgQueue);//注册回调信息队列
+    void Subscribe(const string &strInstrumentIDs);//订阅合约
+    void Unsubscribe(const string &strInstrumentIDs);//
 
 private:
     void Subscribe(const set<string> &setInstrumentIDs);
     void ReqUserLogin();
-    void RegisterMsgQueue(CTPMsgQueue* pMsgQueue);
+    
     virtual void OnFrontConnected();
     virtual void OnFrontDisconnected(int nReason);
     virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

@@ -2,7 +2,8 @@
 
 #include "CTPStruct.h"
 #include "LockFreeQ.h"
-
+#include<iostream>
+using namespace std;
 class CTPMsgQueue
 {
     //响应队列中可能出现的消息类型（按字母排序）
@@ -247,6 +248,9 @@ private:
     {
         if (m_fnOnRtnDepthMarketData)
             (*m_fnOnRtnDepthMarketData)(pItem->pApi, &pItem->DepthMarketData);
+        CThostFtdcDepthMarketDataField pData = pItem->DepthMarketData;
+        cout << pData.LastPrice << endl;
+        
     }
     void Output_OnRtnInstrumentStatus(SMsgItem* pItem)
     {
