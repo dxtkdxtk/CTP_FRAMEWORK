@@ -3,6 +3,7 @@
 #include "CTPStruct.h"
 #include "LockFreeQ.h"
 #include<iostream>
+#include"FunctionCallBackSet.h"
 using namespace std;
 class CTPMsgQueue
 {
@@ -130,6 +131,8 @@ public:
     void RegisterCallback(fnOnRtnOrder pCallback){ m_fnOnRtnOrder = pCallback; }
     void RegisterCallback(fnOnRtnTrade pCallback){ m_fnOnRtnTrade = pCallback; }
 
+    void RegisterCallback(FunctionCallBackSet *CallbackSet);//注册所有函数
+
     //响应结果处理后入队列(按字母排序)
     void Input_OnConnect(void* pApi, CThostFtdcRspUserLoginField *pRspUserLogin, ConnectionStatus result);
     void Input_OnDisconnect(void* pApi, CThostFtdcRspInfoField *pRspInfo, ConnectionStatus step);
@@ -167,7 +170,6 @@ private:
     {
         if (m_fnOnConnect)
             (*m_fnOnConnect)(pItem->pApi, &pItem->RspUserLogin, pItem->Status);
-        
     }
     void Output_OnDisconnect(SMsgItem* pItem)
     {
@@ -178,94 +180,109 @@ private:
     {
         if (m_fnOnErrRtnOrderAction)
             (*m_fnOnErrRtnOrderAction)(pItem->pApi, &pItem->OrderAction, &pItem->RspInfo);
+        
     }
     void Output_OnErrRtnOrderInsert(SMsgItem* pItem)
     {
         if (m_fnOnErrRtnOrderInsert)
             (*m_fnOnErrRtnOrderInsert)(pItem->pApi, &pItem->InputOrder, &pItem->RspInfo);
+        
     }
     void Output_OnRspError(SMsgItem* pItem)
     {
         if (m_fnOnRspError)
             (*m_fnOnRspError)(pItem->pApi, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspOrderAction(SMsgItem* pItem)
     {
         if (m_fnOnRspOrderAction)
             (*m_fnOnRspOrderAction)(pItem->pApi, &pItem->InputOrderAction, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspOrderInsert(SMsgItem* pItem)
     {
         if (m_fnOnRspOrderInsert)
             (*m_fnOnRspOrderInsert)(pItem->pApi, &pItem->InputOrder, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryInvestorPosition(SMsgItem* pItem)
     {
         if (m_fnOnRspQryInvestorPosition)
             (*m_fnOnRspQryInvestorPosition)(pItem->pApi, &pItem->InvestorPosition, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryInvestorPositionDetail(SMsgItem* pItem)
     {
         if (m_fnOnRspQryInvestorPositionDetail)
             (*m_fnOnRspQryInvestorPositionDetail)(pItem->pApi, &pItem->InvestorPositionDetail, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryDepthMarketData(SMsgItem* pItem)
     {
         if (m_fnOnRspQryDepthMarketData)
             (*m_fnOnRspQryDepthMarketData)(pItem->pApi, &pItem->DepthMarketData, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryInstrument(SMsgItem* pItem)
     {
         if (m_fnOnRspQryInstrument)
             (*m_fnOnRspQryInstrument)(pItem->pApi, &pItem->Instrument, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryInstrumentCommissionRate(SMsgItem* pItem)
     {
         if (m_fnOnRspQryInstrumentCommissionRate)
             (*m_fnOnRspQryInstrumentCommissionRate)(pItem->pApi, &pItem->InstrumentCommissionRate, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryInstrumentMarginRate(SMsgItem* pItem)
     {
         if (m_fnOnRspQryInstrumentMarginRate)
             (*m_fnOnRspQryInstrumentMarginRate)(pItem->pApi, &pItem->InstrumentMarginRate, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryOrder(SMsgItem* pItem)
     {
         if (m_fnOnRspQryOrder)
             (*m_fnOnRspQryOrder)(pItem->pApi, &pItem->Order, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryTrade(SMsgItem* pItem)
     {
         if (m_fnOnRspQryTrade)
             (*m_fnOnRspQryTrade)(pItem->pApi, &pItem->Trade, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRspQryTradingAccount(SMsgItem* pItem)
     {
         if (m_fnOnRspQryTradingAccount)
             (*m_fnOnRspQryTradingAccount)(pItem->pApi, &pItem->TradingAccount, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
+        
     }
     void Output_OnRtnDepthMarketData(SMsgItem* pItem)
     {
         if (m_fnOnRtnDepthMarketData)
             (*m_fnOnRtnDepthMarketData)(pItem->pApi, &pItem->DepthMarketData);
-        CThostFtdcDepthMarketDataField pData = pItem->DepthMarketData;
-        cout << pData.LastPrice << endl;
         
     }
     void Output_OnRtnInstrumentStatus(SMsgItem* pItem)
     {
         if (m_fnOnRtnInstrumentStatus)
             (*m_fnOnRtnInstrumentStatus)(pItem->pApi, &pItem->InstrumentStatus);
+        
     }
     void Output_OnRtnOrder(SMsgItem* pItem)
     {
         if (m_fnOnRtnOrder)
             (*m_fnOnRtnOrder)(pItem->pApi, &pItem->Order);
+        
     }
     void Output_OnRtnTrade(SMsgItem* pItem)
     {
         if (m_fnOnRtnTrade)
             (*m_fnOnRtnTrade)(pItem->pApi, &pItem->Trade);
+        
     }
 
 private:

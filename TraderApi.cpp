@@ -307,10 +307,11 @@ void TraderApi::RunInThread()
 
 void TraderApi::OnFrontConnected()
 {
+    cout << __FUNCTION__ << endl;
     m_status = E_connected;
     if (m_msgQueue)
         m_msgQueue->Input_OnConnect(this, NULL, m_status);
-
+    
     //连接成功后自动请求认证或登录
     if (m_szAuthCode.length()>0
         && m_szUserProductInfo.length()>0)
@@ -484,7 +485,6 @@ int TraderApi::ReqOrderInsert(
 {
     if (NULL == m_pApi)
         return 0;
-
     SRequest* pRequest = MakeRequestBuf(E_InputOrderField);
     if (NULL == pRequest)
         return 0;

@@ -1,5 +1,27 @@
 #include "CTPMsgQueue.h"
-
+void CTPMsgQueue::RegisterCallback(FunctionCallBackSet *CallbackSet)
+{
+    RegisterCallback(&CallbackSet->OnConnect);
+    RegisterCallback(&CallbackSet->OnDisconnect);
+    RegisterCallback(&CallbackSet->OnErrRtnOrderAction);
+    RegisterCallback(&CallbackSet->OnErrRtnOrderInsert);
+    RegisterCallback(&CallbackSet->OnRspError);
+    RegisterCallback(&CallbackSet->OnRspOrderAction);
+    RegisterCallback(&CallbackSet->OnRspOrderInsert);
+    RegisterCallback(&CallbackSet->OnRspQryDepthMarketData);
+    RegisterCallback(&CallbackSet->OnRspQryInstrument);
+    RegisterCallback(&CallbackSet->OnRspQryInstrumentCommissionRate);
+    RegisterCallback(&CallbackSet->OnRspQryInstrumentMarginRate);
+    RegisterCallback(&CallbackSet->OnRspQryInvestorPosition);
+    RegisterCallback(&CallbackSet->OnRspQryInvestorPositionDetail);
+    RegisterCallback(&CallbackSet->OnRspQryOrder);
+    RegisterCallback(&CallbackSet->OnRspQryTrade);
+    RegisterCallback(&CallbackSet->OnRspQryTradingAccount);
+    RegisterCallback(&CallbackSet->OnRtnDepthMarketData);
+    RegisterCallback(&CallbackSet->OnRtnInstrumentStatus);
+    RegisterCallback(&CallbackSet->OnRtnOrder);
+    RegisterCallback(&CallbackSet->OnRtnTrade);
+}
 void CTPMsgQueue::Clear()
 {
     SMsgItem* pItem = NULL;

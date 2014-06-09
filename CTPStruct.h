@@ -15,7 +15,7 @@ enum ConnectionStatus
     E_logining,		//登录中
     E_logined,		//登录成功
     E_confirming,	//结算单确认中
-    E_confirmed,	//已经确认
+    E_confirmed,	//已经确认 
     E_conn_max		//最大值
 };
 
