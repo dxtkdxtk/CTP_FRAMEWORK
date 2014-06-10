@@ -307,7 +307,6 @@ void TraderApi::RunInThread()
 
 void TraderApi::OnFrontConnected()
 {
-    cout << __FUNCTION__ << endl;
     m_status = E_connected;
     if (m_msgQueue)
         m_msgQueue->Input_OnConnect(this, NULL, m_status);
