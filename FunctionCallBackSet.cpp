@@ -1,5 +1,6 @@
 #include"FunctionCallBackSet.h"
 #include<iostream>
+#include<string>
 #include"CLock.h"
 using namespace std;
 
@@ -50,7 +51,8 @@ void __stdcall FunctionCallBackSet::OnRspQryInstrument(void* pTraderApi, CThostF
 {
     //CLock cl(&f_csInstrument);
     cout << "合约名：" << pInstrument->InstrumentID;
-    strAllIns += pInstrument->InstrumentID + ';';
+    strAllIns += pInstrument->InstrumentID;
+    strAllIns += ';';
     lstAllInstruments.push_back(string(pInstrument->InstrumentID));
     cout << "  开始时间：" << pInstrument->CreateDate;
     cout << "  结束时间：" << pInstrument->ExpireDate << endl;
