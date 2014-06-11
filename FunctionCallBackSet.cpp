@@ -1,6 +1,11 @@
 #include"FunctionCallBackSet.h"
 #include<iostream>
+#include"CLock.h"
 using namespace std;
+
+list<string> FunctionCallBackSet::lstAllInstruments;
+string FunctionCallBackSet::strAllIns;
+CRITICAL_SECTION FunctionCallBackSet::f_csInstrument;
 void __stdcall FunctionCallBackSet::OnConnect(void* pApi, CThostFtdcRspUserLoginField *pRspUserLogin, ConnectionStatus result)
 {
 
@@ -43,7 +48,10 @@ void __stdcall FunctionCallBackSet::OnRspQryDepthMarketData(void* pTraderApi, CT
 
 void __stdcall FunctionCallBackSet::OnRspQryInstrument(void* pTraderApi, CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
+    //CLock cl(&f_csInstrument);
     cout << "合约名：" << pInstrument->InstrumentID;
+    strAllIns += pInstrument->InstrumentID + ';';
+    lstAllInstruments.push_back(string(pInstrument->InstrumentID));
     cout << "  开始时间：" << pInstrument->CreateDate;
     cout << "  结束时间：" << pInstrument->ExpireDate << endl;
 }
@@ -85,6 +93,7 @@ void __stdcall FunctionCallBackSet::OnRspQryTradingAccount(void* pTraderApi, CTh
 
 void __stdcall FunctionCallBackSet::OnRtnDepthMarketData(void* pMdUserApi, CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
+    cout << pDepthMarketData->InstrumentID << "： ";
     cout << pDepthMarketData->LastPrice << endl;
 }
 

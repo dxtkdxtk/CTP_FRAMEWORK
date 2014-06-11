@@ -1,6 +1,8 @@
+//TraderApi
 
 #include "TraderApi.h"
 #define _SEP_ ",;"
+
 TraderApi::TraderApi(void)
 {
     m_pApi = NULL;
@@ -10,7 +12,6 @@ TraderApi::TraderApi(void)
 
     m_hThread = NULL;
     m_bRunning = false;
-
     InitializeCriticalSection(&m_csList);
     InitializeCriticalSection(&m_csMap);
     InitializeCriticalSection(&m_csOrderRef);

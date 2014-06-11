@@ -3,11 +3,32 @@
 
 #include"CTPStruct.h"
 #include"ThostTraderApi\ThostFtdcUserApiStruct.h"
+#include<list>
+#include<Windows.h>
+using namespace std;
 class FunctionCallBackSet
 {
+
+    
 public:
-    FunctionCallBackSet(){}
-    ~FunctionCallBackSet(){}
+    static list<string> lstAllInstruments;
+    static string strAllIns;
+    static CRITICAL_SECTION f_csInstrument;
+    FunctionCallBackSet()
+    {
+        lstAllInstruments.clear();
+        strAllIns = "";
+        InitializeCriticalSection(&f_csInstrument);
+    }
+    ~FunctionCallBackSet()
+    {
+        DeleteCriticalSection(&f_csInstrument);
+    }
+
+    string GetAllIns()
+    {
+        return strAllIns;
+    }
     static void __stdcall OnConnect(void* pApi, CThostFtdcRspUserLoginField *pRspUserLogin, ConnectionStatus result);//连接后的结果状态
     static void __stdcall OnDisconnect(void* pApi, CThostFtdcRspInfoField *pRspInfo, ConnectionStatus step);//出错时所处的状态
     static void __stdcall OnErrRtnOrderAction(void* pTraderApi, CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo);
