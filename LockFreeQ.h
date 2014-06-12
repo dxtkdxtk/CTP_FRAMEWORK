@@ -147,7 +147,10 @@ private:
         pointer_t(const pointer_t& p)
         {
             InterlockedExchange(&count, p.count);
-            InterlockedExchangePointer(&ptr, p.ptr);
+            
+            //更改win64平台
+            //InterlockedExchangePointer(&ptr, p.ptr);
+            (PVOID)InterlockedExchange((PLONG)(&ptr), (LONG)(p.ptr));
         }
 
         pointer_t(const pointer_t* p) : ptr(NULL), count(0)
@@ -156,7 +159,8 @@ private:
                 return;
 
             InterlockedExchange(&count, const_cast< LONG >(p->count));
-            InterlockedExchangePointer(ptr, const_cast< node_t* >(p->ptr));
+            //InterlockedExchangePointer(ptr, const_cast< node_t* >(p->ptr));
+            (PVOID)InterlockedExchange((PLONG)(&ptr), (LONG)(const_cast< node_t* >(p->ptr)));
         }
 
     };

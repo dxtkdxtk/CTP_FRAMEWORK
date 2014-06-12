@@ -22,6 +22,9 @@ public:
     {
         msgQueue->StopThread();
         msgQueue->Clear();
+        td->Disconnect();
+        md->Disconnect();
+        delete callbackSet;
         delete msgQueue;
     }
     void readInifile(char* file)
