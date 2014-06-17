@@ -1,7 +1,7 @@
-#include"FunctionCallBackSet.h"
-#include<iostream>
-#include<string>
-#include"CLock.h"
+#include "FunctionCallBackSet.h"
+#include <iostream>
+#include <string>
+#include "CLock.h"
 using namespace std;
 
 list<string> FunctionCallBackSet::lstAllInstruments;

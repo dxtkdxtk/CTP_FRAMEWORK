@@ -1,6 +1,6 @@
 #ifndef CTPSTRUCT_H
 #define CTPSTRUCT_H
-#include"ThostTraderApi\ThostFtdcUserApiStruct.h"
+#include "ThostTraderApi\ThostFtdcUserApiStruct.h"
 
 //Á¬½Ó×´Ì¬
 enum ConnectionStatus

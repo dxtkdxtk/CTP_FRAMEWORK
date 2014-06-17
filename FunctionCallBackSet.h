@@ -1,10 +1,10 @@
 #ifndef FUNCTION_CALL_BACK_H
 #define FUNCTION_CALL_BACK_H
 
-#include"CTPStruct.h"
-#include"ThostTraderApi\ThostFtdcUserApiStruct.h"
-#include<list>
-#include<Windows.h>
+#include "CTPStruct.h"
+#include "ThostTraderApi\ThostFtdcUserApiStruct.h"
+#include <list>
+#include <Windows.h>
 using namespace std;
 class FunctionCallBackSet
 {

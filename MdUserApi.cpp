@@ -1,7 +1,7 @@
-#include"MdUserApi.h"
-#include<iostream>
-#include"toolkit.h"
-#include"CLock.h"
+#include "MdUserApi.h"
+#include <iostream>
+#include "toolkit.h"
+#include "CLock.h"
 using namespace std;
 #define _CTP_SEPS_ ",;"
 MdUserApi::MdUserApi(void)

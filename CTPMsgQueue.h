@@ -2,8 +2,8 @@
 
 #include "CTPStruct.h"
 #include "LockFreeQ.h"
-#include<iostream>
-#include"FunctionCallBackSet.h"
+#include <iostream>
+#include "FunctionCallBackSet.h"
 using namespace std;
 class CTPMsgQueue
 {

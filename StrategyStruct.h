@@ -1,7 +1,7 @@
 #ifndef STASTRUCT_H
 #define STATRUCT_H
-#include"MdUserApi.h"
-#include"TraderApi.h"
+#include "MdUserApi.h"
+#include "TraderApi.h"
 using namespace std;
 class StrategyStruct
 {

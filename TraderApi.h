@@ -6,12 +6,12 @@
 #include <list>
 #include <map>
 #include <string>
-#include<Windows.h>
-#include"LockFreeQ.h"
-#include"CLock.h"
-#include"CTPStruct.h"
-#include"CTPMsgQueue.h"
-#include"toolkit.h"
+#include <Windows.h>
+#include "LockFreeQ.h"
+#include "CLock.h"
+#include "CTPStruct.h"
+#include "CTPMsgQueue.h"
+#include "toolkit.h"
 using namespace std;
 
 class CTPMsgQueue;

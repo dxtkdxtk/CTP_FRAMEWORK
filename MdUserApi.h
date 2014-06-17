@@ -1,11 +1,11 @@
 #ifndef MDUSERAPI_H
 #define MDUSERAPI_H
-#include"ThostTraderApi\ThostFtdcMdApi.h"
-#include"CTPStruct.h"
-#include"CTPMsgQueue.h"
-#include<set>
-#include<string>
-#include<Windows.h>
+#include "ThostTraderApi\ThostFtdcMdApi.h"
+#include "CTPStruct.h"
+#include "CTPMsgQueue.h"
+#include <set>
+#include <string>
+#include <Windows.h>
 using namespace std;
 class MdUserApi : public CThostFtdcMdSpi
 {
